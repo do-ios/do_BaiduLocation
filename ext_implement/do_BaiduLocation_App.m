@@ -10,12 +10,21 @@
 #import "doIModuleExtManage.h"
 #import "doServiceContainer.h"
 #import "BMapKit.h"
+@class do_BaiduLocation_App;
+static do_BaiduLocation_App * instance;
 @interface do_BaiduLocation_App() <BMKGeneralDelegate>
 
 @end
 
 @implementation do_BaiduLocation_App
-@synthesize ThridPartyID;
+@synthesize OpenURLScheme;
++ (instancetype) Instances
+{
+    if (instance == nil) {
+        instance = [[do_BaiduLocation_App alloc]init];
+    }
+    return instance;
+}
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     BMKMapManager *_mapManager = [[BMKMapManager alloc]init];
