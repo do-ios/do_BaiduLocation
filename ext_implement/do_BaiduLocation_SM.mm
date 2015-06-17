@@ -23,6 +23,7 @@
     NSDictionary *_dictParas;
     id<doIScriptEngine> _scritEngine;
     NSString *_callbackName;
+    Boolean isLoop;
 }
 
 #pragma mark -
@@ -58,38 +59,41 @@
 /**
  *停止定位
  */
- - (void)stop:(NSArray *)parms
+ - (Boolean)stop:(NSArray *)parms
  {
 //     doJsonNode *_dictParas = [parms objectAtIndex:0];
 //     id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
 //     //自己的代码实现
      [_locService stopUserLocationService];
+     return YES;
  }
 //异步
 /**
  *启动定位服务
  */
-- (void)getLocation:(NSArray *)parms
+- (Boolean)start:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
-    _scritEngine = [parms objectAtIndex:1];
+//    _scritEngine = [parms objectAtIndex:1];
     //自己的代码实现
     
-    _callbackName = [parms objectAtIndex:2];
-    NSString *_model = [doJsonHelper GetOneText:_dictParas :@"model" :@"gps"];
-    if ([_model isEqualToString:@"accuracy"])
+//    _callbackName = [parms objectAtIndex:2];
+    NSString *_model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
+    if ([_model isEqualToString:@"high"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
     }
-    else if ([_model isEqualToString:@"lowpower"])
+    else if ([_model isEqualToString:@"low"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
     }
-    else
+    else if ([_model isEqualToString:@"middle"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
     }
     
+    // 是否循环不停的获取
+    isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
     [BMKLocationService setLocationDistanceFilter:1000.f];
     
     _locService = [[BMKLocationService alloc]init];
@@ -97,6 +101,7 @@
     [_locService startUserLocationService];
     _geocodesearch = [[BMKGeoCodeSearch alloc]init];
     _geocodesearch.delegate = self;
+    return YES;
 }
 
 /**
@@ -162,13 +167,18 @@
         _pointAnnotation.title = result.address;
         
         NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
-        [_dict setValue:@"bd-0911" forKey:@"type"];
+//        [_dict setValue:@"bd-0911" forKey:@"type"];
         [_dict setValue:[NSString stringWithFormat:@"%f",_pointAnnotation.coordinate.latitude] forKey:@"latitude"];
         [_dict setValue:[NSString stringWithFormat:@"%f",_pointAnnotation.coordinate.longitude] forKey:@"longitude"];
         [_dict setValue:_pointAnnotation.title forKey:@"address"];
         doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
         [_invokeResult SetResultNode: _dict];
-        [_scritEngine Callback:_callbackName :_invokeResult];
+//        [_scritEngine Callback:_callbackName :_invokeResult];
+        [self.EventCenter FireEvent:@"result" :_invokeResult];
+    }
+    if (!isLoop)
+    {
+        [_locService stopUserLocationService];
     }
 }
 
@@ -185,13 +195,18 @@
         _pointAnnotation.coordinate = result.location;
         _pointAnnotation.title = result.address;
         NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
-        [_dict setValue:@"bd-0911" forKey:@"type"];
+//        [_dict setValue:@"bd-0911" forKey:@"type"];
         [_dict setValue:[NSString stringWithFormat:@"%f",_pointAnnotation.coordinate.latitude] forKey:@"latitude"];
         [_dict setValue:[NSString stringWithFormat:@"%f",_pointAnnotation.coordinate.longitude] forKey:@"longitude"];
         [_dict setValue:_pointAnnotation.title forKey:@"address"];
         doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
         [_invokeResult SetResultNode: _dict];
-        [_scritEngine Callback:_callbackName :_invokeResult];
+//        [_scritEngine Callback:_callbackName :_invokeResult];
+        [self.EventCenter FireEvent:@"result" :_invokeResult];
+    }
+    if (!isLoop)
+    {
+        [_locService stopUserLocationService];
     }
 }
 
