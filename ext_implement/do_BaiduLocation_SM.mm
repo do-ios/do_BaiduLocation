@@ -15,7 +15,7 @@
 #import "BMapKit.h"
 @interface do_BaiduLocation_SM() <do_BaiduLocation_ISM, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 @end
-static do_BaiduLocation_SM *_baiduLocation;
+
 NSString *_model;
 BMKLocationService *_locService;
 BMKGeoCodeSearch *_geocodesearch;
