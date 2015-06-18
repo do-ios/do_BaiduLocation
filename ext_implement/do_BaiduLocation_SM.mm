@@ -15,15 +15,19 @@
 #import "BMapKit.h"
 @interface do_BaiduLocation_SM() <do_BaiduLocation_ISM, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 @end
+static do_BaiduLocation_SM *_baiduLocation;
+NSString *_model;
+BMKLocationService *_locService;
+BMKGeoCodeSearch *_geocodesearch;
+
 @implementation do_BaiduLocation_SM
 {
-    BMKLocationService *_locService;
-    BMKGeoCodeSearch *_geocodesearch;
+
     CLLocationCoordinate2D _coordinate;
     NSDictionary *_dictParas;
     id<doIScriptEngine> _scritEngine;
     NSString *_callbackName;
-    Boolean isLoop;
+
 }
 
 #pragma mark -
@@ -54,12 +58,38 @@
      如：（回调一个字符串）
      [_invokeResult SetResultText: @"异步方法完成"];
      [_scritEngine Callback:_callbackName :_invokeResult];
+
  */
++ (void)startService
+{
+    if ([_model isEqualToString:@"high"])
+    {
+        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+        [BMKLocationService setLocationDistanceFilter:10.f];
+    }
+    else if ([_model isEqualToString:@"low"])
+    {
+        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
+        [BMKLocationService setLocationDistanceFilter:1000.f];
+    }
+    else if ([_model isEqualToString:@"middle"])
+    {
+        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
+        [BMKLocationService setLocationDistanceFilter:100.f];
+    }
+    
+    _locService = [[BMKLocationService alloc]init];
+    _locService.delegate = self;
+    [_locService startUserLocationService];
+    _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+    _geocodesearch.delegate = self;
+}
+
 //同步
 /**
  *停止定位
  */
- - (Boolean)stop:(NSArray *)parms
+ - (BOOL)stop:(NSArray *)parms
  {
 //     doJsonNode *_dictParas = [parms objectAtIndex:0];
 //     id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
@@ -71,30 +101,33 @@
 /**
  *启动定位服务
  */
-- (Boolean)start:(NSArray *)parms
+- (BOOL)start:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
 //    _scritEngine = [parms objectAtIndex:1];
     //自己的代码实现
     
 //    _callbackName = [parms objectAtIndex:2];
-    NSString *_model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
+    _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
     if ([_model isEqualToString:@"high"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
+        [BMKLocationService setLocationDistanceFilter:10.f];
     }
     else if ([_model isEqualToString:@"low"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
+        [BMKLocationService setLocationDistanceFilter:1000.f];
     }
     else if ([_model isEqualToString:@"middle"])
     {
         [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
+        [BMKLocationService setLocationDistanceFilter:100.f];
     }
     
     // 是否循环不停的获取
-    isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
-    [BMKLocationService setLocationDistanceFilter:1000.f];
+    self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
+//    [BMKLocationService setLocationDistanceFilter:1000.f];
     
     _locService = [[BMKLocationService alloc]init];
     _locService.delegate = self;
@@ -176,7 +209,7 @@
 //        [_scritEngine Callback:_callbackName :_invokeResult];
         [self.EventCenter FireEvent:@"result" :_invokeResult];
     }
-    if (!isLoop)
+    if (!self.isLoop)
     {
         [_locService stopUserLocationService];
     }
@@ -204,7 +237,7 @@
 //        [_scritEngine Callback:_callbackName :_invokeResult];
         [self.EventCenter FireEvent:@"result" :_invokeResult];
     }
-    if (!isLoop)
+    if (!self.isLoop)
     {
         [_locService stopUserLocationService];
     }

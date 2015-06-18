@@ -10,4 +10,6 @@
 #import "do_BaiduLocation_ISM.h"
 
 @interface do_BaiduLocation_SM : doSingletonModule
+@property (assign, nonatomic) BOOL isLoop;
++ (void)startService;
 @end

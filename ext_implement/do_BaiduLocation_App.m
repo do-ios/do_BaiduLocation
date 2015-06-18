@@ -10,6 +10,9 @@
 #import "doIModuleExtManage.h"
 #import "doServiceContainer.h"
 #import "BMapKit.h"
+#import "do_BaiduLocation_SM.h"
+#import "doScriptEngineHelper.h"
+
 @class do_BaiduLocation_App;
 static do_BaiduLocation_App * instance;
 @interface do_BaiduLocation_App() <BMKGeneralDelegate>
@@ -52,7 +55,10 @@ static do_BaiduLocation_App * instance;
 }
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    
+ 
+    if (((do_BaiduLocation_SM *)[doScriptEngineHelper ParseSingletonModule:nil :@"do_BaiduLocation"]).isLoop) {
+        [do_BaiduLocation_SM startService];
+    }
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {

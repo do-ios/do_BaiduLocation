@@ -12,7 +12,7 @@
 
 @required
 //实现同步或异步方法，parms中包含了所需用的属性
-- (Boolean)start:(NSArray *)parms;
-- (Boolean)stop:(NSArray *)parms;
+- (BOOL)start:(NSArray *)parms;
+- (BOOL)stop:(NSArray *)parms;
 
 @end
