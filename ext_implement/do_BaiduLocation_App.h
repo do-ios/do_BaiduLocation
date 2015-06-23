@@ -11,5 +11,5 @@
 #import "doIAppDelegate.h"
 
 @interface do_BaiduLocation_App : NSObject<doIAppDelegate>
-+ (instancetype) Instances;
++ (instancetype) Instance;
 @end

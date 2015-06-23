@@ -21,7 +21,7 @@ static do_BaiduLocation_App * instance;
 
 @implementation do_BaiduLocation_App
 @synthesize OpenURLScheme;
-+ (instancetype) Instances
++ (instancetype) Instance
 {
     if (instance == nil) {
         instance = [[do_BaiduLocation_App alloc]init];
