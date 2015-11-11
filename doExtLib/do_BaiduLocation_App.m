@@ -1,19 +1,76 @@
 //
-//  do_BaiduLocation_App.m
+//  TYPEID_App.m
 //  DoExt_SM
 //
-//  Created by @userName on @time.
+//  Created by guoxj on 15/4/8.
 //  Copyright (c) 2015年 DoExt. All rights reserved.
 //
 
 #import "do_BaiduLocation_App.h"
-static do_BaiduLocation_App* instance;
+#import "doIModuleExtManage.h"
+#import "doServiceContainer.h"
+#import "do_BaiduLocation_SM.h"
+#import "doScriptEngineHelper.h"
+
+#import <BaiduMapAPI_Base/BMKBaseComponent.h>
+
+@class do_BaiduLocation_App;
+static do_BaiduLocation_App * instance;
+@interface do_BaiduLocation_App() <BMKGeneralDelegate>
+
+@end
+
 @implementation do_BaiduLocation_App
 @synthesize OpenURLScheme;
-+(id) Instance
++ (instancetype) Instance
 {
-    if(instance==nil)
+    if (instance == nil) {
         instance = [[do_BaiduLocation_App alloc]init];
+    }
     return instance;
+}
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    BMKMapManager *_mapManager = [[BMKMapManager alloc]init];
+    NSString *_BMKMapKey = [[doServiceContainer Instance].ModuleExtManage GetThirdAppKey:@"baiduLocationAppKey.plist" :@"baiduLocationAppKey" ];
+    [application setValue:@"start" forKey:@"BaiduLocation"];
+    NSString *isStart = [application valueForKey:@"BaiduMapView"];
+    if (![isStart isEqualToString:@"start"]) {
+        [_mapManager start:_BMKMapKey generalDelegate:self];
+    }
+    return YES;
+}
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url fromThridParty:(NSString *)_id
+{
+    return NO;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation fromThridParty:(NSString *)_id
+{
+    return NO;
+}
+
+- (void)applicationWillResignActive:(UIApplication *)application
+{
+    
+}
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    
+}
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    
+    if (((do_BaiduLocation_SM *)[doScriptEngineHelper ParseSingletonModule:nil :@"do_BaiduLocation"]).isLoop) {
+        [do_BaiduLocation_SM startService];
+    }
+}
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    
+}
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    
 }
 @end

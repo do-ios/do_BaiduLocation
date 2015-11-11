@@ -13,13 +13,13 @@
 #import "doInvokeResult.h"
 #import "doJsonHelper.h"
 
-#import <BaiduMapAPI_Base/BMKMapManager.h>
+#import <BaiduMapAPI_Base/BMKBaseComponent.h>
 
-#import <BaiduMapAPI_Location/BMKLocationService.h>
+#import <BaiduMapAPI_Location/BMKLocationComponent.h>
 
 #import <BaiduMapAPI_Search/BMKGeocodeSearch.h>
 @interface do_BaiduLocation_SM() <do_BaiduLocation_ISM, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
-@property (assign, nonatomic) BOOL isLoop;
+
 @end
 
 NSString *_model;
@@ -107,7 +107,31 @@ BMKGeoCodeSearch *_geocodesearch;
     // 是否循环不停的获取
     self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
 }
-
++ (void)startService
+{
+    if ([_model isEqualToString:@"high"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyBest;
+        _locService.distanceFilter = 10.f;
+    }
+    else if ([_model isEqualToString:@"low"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
+        _locService.distanceFilter = 1000.f;
+    }
+    else if ([_model isEqualToString:@"middle"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        _locService.distanceFilter = 100.f;
+    }
+    if (_locService == nil) {
+        _locService = [[BMKLocationService alloc]init];
+        _locService.delegate = self;
+        [_locService startUserLocationService];
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
+}
 /**
  *用户方向更新后，会调用此函数
  *@param userLocation 新的用户位置
