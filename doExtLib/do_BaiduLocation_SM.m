@@ -66,31 +66,6 @@ BMKGeoCodeSearch *_geocodesearch;
  [_scritEngine Callback:_callbackName :_invokeResult];
  
  */
-+ (void)startService
-{
-    if ([_model isEqualToString:@"high"])
-    {
-        
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-        [BMKLocationService setLocationDistanceFilter:10.f];
-    }
-    else if ([_model isEqualToString:@"low"])
-    {
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
-        [BMKLocationService setLocationDistanceFilter:1000.f];
-    }
-    else if ([_model isEqualToString:@"middle"])
-    {
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
-        [BMKLocationService setLocationDistanceFilter:100.f];
-    }
-    
-    _locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
-    [_locService startUserLocationService];
-    _geocodesearch = [[BMKGeoCodeSearch alloc]init];
-    _geocodesearch.delegate = self;
-}
 
 //同步
 /**
@@ -107,34 +82,30 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)start:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
-    //    _scritEngine = [parms objectAtIndex:1];
-    //自己的代码实现
-    
-    //    _callbackName = [parms objectAtIndex:2];
-    _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
-    if ([_model isEqualToString:@"high"])
-    {
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyBest];
-        [BMKLocationService setLocationDistanceFilter:10.f];
-    }
-    else if ([_model isEqualToString:@"low"])
-    {
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyThreeKilometers];
-        [BMKLocationService setLocationDistanceFilter:1000.f];
-    }
-    else if ([_model isEqualToString:@"middle"])
-    {
-        [BMKLocationService setLocationDesiredAccuracy:kCLLocationAccuracyNearestTenMeters];
-        [BMKLocationService setLocationDistanceFilter:100.f];
-    }
-    
-    // 是否循环不停的获取
-    self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
     _locService = [[BMKLocationService alloc]init];
     _locService.delegate = self;
     [_locService startUserLocationService];
     _geocodesearch = [[BMKGeoCodeSearch alloc]init];
     _geocodesearch.delegate = self;
+    _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
+    if ([_model isEqualToString:@"high"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyBest;
+        _locService.distanceFilter = 10.f;
+    }
+    else if ([_model isEqualToString:@"low"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
+        _locService.distanceFilter = 1000.f;
+    }
+    else if ([_model isEqualToString:@"middle"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        _locService.distanceFilter = 100.f;
+    }
+    
+    // 是否循环不停的获取
+    self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
 }
 
 /**
