@@ -60,9 +60,9 @@ static do_BaiduLocation_App * instance;
 }
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    
-    if (((do_BaiduLocation_SM *)[doScriptEngineHelper ParseSingletonModule:nil :@"do_BaiduLocation"]).isLoop) {
-        [do_BaiduLocation_SM startService];
+    do_BaiduLocation_SM *baidu = (do_BaiduLocation_SM*)[doScriptEngineHelper ParseSingletonModule:nil :@"do_BaiduLocation"];
+    if (baidu.isLoop) {
+        [baidu startService];
     }
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application

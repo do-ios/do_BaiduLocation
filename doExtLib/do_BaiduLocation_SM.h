@@ -11,5 +11,5 @@
 
 @interface do_BaiduLocation_SM : doSingletonModule<do_BaiduLocation_ISM>
 @property (assign, nonatomic) BOOL isLoop;
-+ (void)startService;
+-(void)startService;
 @end

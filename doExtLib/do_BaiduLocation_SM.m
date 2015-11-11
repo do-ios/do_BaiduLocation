@@ -107,7 +107,7 @@ BMKGeoCodeSearch *_geocodesearch;
     // 是否循环不停的获取
     self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
 }
-+ (void)startService
+- (void)startService
 {
     if ([_model isEqualToString:@"high"])
     {
