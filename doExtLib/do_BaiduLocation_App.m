@@ -36,7 +36,7 @@ static do_BaiduLocation_App * instance;
     NSString *isStart =  objc_getAssociatedObject(application, "BaiduMapView");
     objc_setAssociatedObject(application, "BaiduLocation", @"start", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (![isStart isEqualToString:@"start"]) {
-        [_mapManager start:_BMKMapKey generalDelegate:self];
+        [_mapManager start:_BMKMapKey generalDelegate:nil];
     }
     return YES;
 }

@@ -74,6 +74,10 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)stop:(NSArray *)parms
 {
     [_locService stopUserLocationService];
+    _locService.delegate = nil;
+    _locService = nil;
+    _geocodesearch.delegate = nil;
+    _geocodesearch = nil;
 }
 //异步
 /**
