@@ -11,7 +11,7 @@
 #import "doServiceContainer.h"
 #import "do_BaiduLocation_SM.h"
 #import "doScriptEngineHelper.h"
-
+#import <objc/runtime.h>
 #import <BaiduMapAPI_Base/BMKBaseComponent.h>
 
 @class do_BaiduLocation_App;
@@ -33,8 +33,8 @@ static do_BaiduLocation_App * instance;
 {
     BMKMapManager *_mapManager = [[BMKMapManager alloc]init];
     NSString *_BMKMapKey = [[doServiceContainer Instance].ModuleExtManage GetThirdAppKey:@"baiduLocationAppKey.plist" :@"baiduLocationAppKey" ];
-    [application setValue:@"start" forKey:@"BaiduLocation"];
-    NSString *isStart = [application valueForKey:@"BaiduMapView"];
+    NSString *isStart =  objc_getAssociatedObject(application, "BaiduMapView");
+    objc_setAssociatedObject(application, "BaiduLocation", @"start", OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     if (![isStart isEqualToString:@"start"]) {
         [_mapManager start:_BMKMapKey generalDelegate:self];
     }
