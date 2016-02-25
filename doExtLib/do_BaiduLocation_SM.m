@@ -18,6 +18,9 @@
 #import <BaiduMapAPI_Location/BMKLocationComponent.h>
 
 #import <BaiduMapAPI_Search/BMKGeocodeSearch.h>
+
+#import <BaiduMapAPI_Utils/BMKUtilsComponent.h>
+
 @interface do_BaiduLocation_SM() <do_BaiduLocation_ISM, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 @end
@@ -135,6 +138,24 @@ BMKGeoCodeSearch *_geocodesearch;
         _geocodesearch = [[BMKGeoCodeSearch alloc]init];
         _geocodesearch.delegate = self;
     }
+}
+- (void)getDistance:(NSArray *)parms
+{
+    NSDictionary *dictParas = [parms objectAtIndex:0];
+    //参数字典_dictParas
+    //    id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
+    //自己的代码实现
+
+    NSString *startPoint = [doJsonHelper GetOneText:dictParas :@"startPoint" :@""];
+    NSString *endPoint = [doJsonHelper GetOneText:dictParas :@"endPoint" :@""];
+    NSArray *starts = [startPoint componentsSeparatedByString:@","];
+    NSArray *ends = [endPoint componentsSeparatedByString:@","];
+    BMKMapPoint point1 = BMKMapPointForCoordinate(CLLocationCoordinate2DMake([[starts firstObject] floatValue],[[starts lastObject]floatValue]));
+    BMKMapPoint point2 = BMKMapPointForCoordinate(CLLocationCoordinate2DMake([[ends firstObject] floatValue],[[ends lastObject]floatValue]));
+    CLLocationDistance distance = BMKMetersBetweenMapPoints(point1,point2);
+    doInvokeResult *_invokeResult = [parms objectAtIndex:2];
+    [_invokeResult SetResultFloat:distance];
+    //_invokeResult设置返回值
 }
 /**
  *用户方向更新后，会调用此函数

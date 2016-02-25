@@ -14,5 +14,6 @@
 @required
 - (void)start:(NSArray *)parms;
 - (void)stop:(NSArray *)parms;
+- (void)getDistance:(NSArray *)parms;
 
 @end
