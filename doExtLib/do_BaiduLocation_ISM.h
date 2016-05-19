@@ -15,5 +15,7 @@
 - (void)start:(NSArray *)parms;
 - (void)stop:(NSArray *)parms;
 - (void)getDistance:(NSArray *)parms;
-
+- (void)locate:(NSArray *)parms;
+- (void)startScan:(NSArray *)parms;
+- (void)stopScan:(NSArray *)parms;
 @end

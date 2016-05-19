@@ -37,6 +37,7 @@ BMKGeoCodeSearch *_geocodesearch;
     id<doIScriptEngine> _scritEngine;
     NSString *_callbackName;
     
+    BOOL _isScan;
 }
 
 #pragma mark -
@@ -114,6 +115,7 @@ BMKGeoCodeSearch *_geocodesearch;
     // 是否循环不停的获取
     self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
 }
+
 - (void)startService
 {
     if ([_model isEqualToString:@"high"])
@@ -157,6 +159,51 @@ BMKGeoCodeSearch *_geocodesearch;
     [_invokeResult SetResultFloat:distance];
     //_invokeResult设置返回值
 }
+- (void)startScan:(NSArray *)parms
+{
+    _isScan = YES;
+    [self beginLocation:parms];
+}
+- (void)stopScan:(NSArray *)parms
+{
+    [_locService stopUserLocationService];
+    _locService.delegate = nil;
+    _locService = nil;
+    _geocodesearch.delegate = nil;
+    _geocodesearch = nil;
+}
+- (void)locate:(NSArray *)parms
+{
+    _isScan = NO;
+    [self beginLocation:parms];
+}
+#pragma mark - 私有方法
+- (void)beginLocation:(NSArray *)parms
+{
+    _dictParas = [parms objectAtIndex:0];
+    _locService = [[BMKLocationService alloc]init];
+    _locService.delegate = self;
+    [_locService startUserLocationService];
+    _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+    _geocodesearch.delegate = self;
+    _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
+    if ([_model isEqualToString:@"high"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyBest;
+        _locService.distanceFilter = 10.f;
+    }
+    else if ([_model isEqualToString:@"low"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyThreeKilometers;
+        _locService.distanceFilter = 1000.f;
+    }
+    else if ([_model isEqualToString:@"middle"])
+    {
+        _locService.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+        _locService.distanceFilter = 100.f;
+    }
+}
+#pragma mark - BMKLocationServiceDelegate方法
 /**
  *用户方向更新后，会调用此函数
  *@param userLocation 新的用户位置
@@ -206,6 +253,7 @@ BMKGeoCodeSearch *_geocodesearch;
     
 }
 
+#pragma mark - BMKGeoCodeSearchDelegate方法
 /**
  *返回地址信息搜索结果
  *@param searcher 搜索对象
@@ -225,6 +273,9 @@ BMKGeoCodeSearch *_geocodesearch;
     }
     if (!self.isLoop)
     {
+        [_locService stopUserLocationService];
+    }
+    if (!_isScan) {
         [_locService stopUserLocationService];
     }
 }
