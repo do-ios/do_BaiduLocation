@@ -38,6 +38,8 @@ BMKGeoCodeSearch *_geocodesearch;
     NSString *_callbackName;
     
     BOOL _isScan;
+    //调用locate方法
+    BOOL _isLocating;
 }
 
 #pragma mark -
@@ -175,7 +177,12 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)locate:(NSArray *)parms
 {
     _isScan = NO;
+    _isLocating = YES;
+    _dictParas = [parms objectAtIndex:0];
+    _scritEngine = [parms objectAtIndex:1];
+    _callbackName = [parms objectAtIndex:2];
     [self beginLocation:parms];
+    
 }
 #pragma mark - 私有方法
 - (void)beginLocation:(NSArray *)parms
@@ -262,8 +269,9 @@ BMKGeoCodeSearch *_geocodesearch;
  */
 - (void)onGetGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
 {
+    NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
     if (error == 0) {
-        NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
+        
         [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
         [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
         [_dict setValue:result.address forKey:@"address"];
@@ -278,6 +286,11 @@ BMKGeoCodeSearch *_geocodesearch;
     if (!_isScan) {
         [_locService stopUserLocationService];
     }
+    if (_isLocating) {
+        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+        [result SetResultNode:_dict];
+        [_scritEngine Callback:_callbackName :result];
+    }
 }
 
 /**
@@ -288,8 +301,9 @@ BMKGeoCodeSearch *_geocodesearch;
  */
 -(void) onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
 {
+    NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
     if (error == 0) {
-        NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
+        
         [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
         [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
         [_dict setValue:result.address forKey:@"address"];
@@ -300,6 +314,14 @@ BMKGeoCodeSearch *_geocodesearch;
     if (!self.isLoop)
     {
         [_locService stopUserLocationService];
+    }
+    if (!_isScan) {
+        [_locService stopUserLocationService];
+    }
+    if (_isLocating) {
+        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+        [result SetResultNode:_dict];
+        [_scritEngine Callback:_callbackName :result];
     }
 }
 
