@@ -92,11 +92,17 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)start:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
-    _locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
+    if (!_locService) {
+       _locService = [[BMKLocationService alloc]init];
+        _locService.delegate = self;
+    }
+    
     [_locService startUserLocationService];
-    _geocodesearch = [[BMKGeoCodeSearch alloc]init];
-    _geocodesearch.delegate = self;
+    if (!_geocodesearch) {
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
+    
     _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
     if ([_model isEqualToString:@"high"])
     {
@@ -188,11 +194,20 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)beginLocation:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
-    _locService = [[BMKLocationService alloc]init];
-    _locService.delegate = self;
+    if (!_locService) {
+        _locService = [[BMKLocationService alloc]init];
+        _locService.delegate = self;
+    }
+    
+    
     [_locService startUserLocationService];
-    _geocodesearch = [[BMKGeoCodeSearch alloc]init];
-    _geocodesearch.delegate = self;
+    
+    if (!_geocodesearch) {
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
+    
+    
     _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
     if ([_model isEqualToString:@"high"])
     {
