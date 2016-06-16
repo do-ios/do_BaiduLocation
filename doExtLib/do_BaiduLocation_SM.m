@@ -190,6 +190,46 @@ BMKGeoCodeSearch *_geocodesearch;
     [self beginLocation:parms];
     
 }
+- (void)geoCode:(NSArray *)parms
+{
+    _dictParas = [parms objectAtIndex:0];
+    //参数字典_dictParas
+    _scritEngine = [parms objectAtIndex:1];
+    _callbackName = [parms objectAtIndex:2];
+    NSString *city = [doJsonHelper GetOneText:_dictParas :@"city" :@""];
+    NSString *address = [doJsonHelper GetOneText:_dictParas :@"address" :@""];
+    if (!_geocodesearch) {
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
+    BMKGeoCodeSearchOption *option = [[BMKGeoCodeSearchOption alloc]init];
+    option.city = city;
+    option.address = address;
+    [_geocodesearch geoCode:option];
+    
+}
+- (void)reverseGeoCode:(NSArray *)parms
+{
+    _dictParas = [parms objectAtIndex:0];
+    //参数字典_dictParas
+    _scritEngine = [parms objectAtIndex:1];
+    _callbackName = [parms objectAtIndex:2];
+    
+    if (!_geocodesearch) {
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
+    
+    NSString *latitude = [doJsonHelper GetOneText:_dictParas :@"latitude" :@""];
+    NSString *longitude = [doJsonHelper GetOneText:_dictParas :@"longitude" :@""];
+    BMKReverseGeoCodeOption *option = [[BMKReverseGeoCodeOption alloc]init];
+    
+    CLLocationCoordinate2D coor = CLLocationCoordinate2DMake(latitude.floatValue, longitude.floatValue);
+    option.reverseGeoPoint = coor;
+    
+    [_geocodesearch reverseGeoCode:option];
+    
+}
 #pragma mark - 私有方法
 - (void)beginLocation:(NSArray *)parms
 {
@@ -293,6 +333,13 @@ BMKGeoCodeSearch *_geocodesearch;
         doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
         [_invokeResult SetResultNode: _dict];
         [self.EventCenter FireEvent:@"result" :_invokeResult];
+        //地理编码回调
+        NSMutableDictionary *node = [NSMutableDictionary dictionary];
+        [node setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
+        [node setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
+        doInvokeResult *invokeResult = [[doInvokeResult alloc]init];
+        [invokeResult SetResultNode:node];
+        [_scritEngine Callback:_callbackName :invokeResult];
     }
     if (!self.isLoop)
     {
@@ -325,6 +372,18 @@ BMKGeoCodeSearch *_geocodesearch;
         doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
         [_invokeResult SetResultNode: _dict];
         [self.EventCenter FireEvent:@"result" :_invokeResult];
+        //地理编码回调
+        NSMutableDictionary *node = [NSMutableDictionary dictionary];
+        [node setObject:result.address forKey:@"address"];
+        [node setObject:result.addressDetail.province forKey:@"province"];
+        [node setObject:result.addressDetail.city forKey:@"city"];
+        [node setObject:result.addressDetail.district forKey:@"district"];
+        [node setObject:result.addressDetail.streetName forKey:@"streetName"];
+        [node setObject:result.addressDetail.streetNumber forKey:@"streetNumber"];
+        
+        doInvokeResult *invokeResult = [[doInvokeResult alloc]init];
+        [invokeResult SetResultNode:node];
+        [_scritEngine Callback:_callbackName :invokeResult];
     }
     if (!self.isLoop)
     {

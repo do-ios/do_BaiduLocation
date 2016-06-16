@@ -18,4 +18,16 @@
 - (void)locate:(NSArray *)parms;
 - (void)startScan:(NSArray *)parms;
 - (void)stopScan:(NSArray *)parms;
+/**
+ *  正向地理编码
+ *
+ *  @param parms <#parms description#>
+ */
+- (void)geoCode:(NSArray *)parms;
+/**
+ *  反向地理编码
+ *
+ *  @param parms <#parms description#>
+ */
+- (void)reverseGeoCode:(NSArray *)parms;
 @end
