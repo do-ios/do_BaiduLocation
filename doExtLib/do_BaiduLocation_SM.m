@@ -152,10 +152,7 @@ BMKGeoCodeSearch *_geocodesearch;
 - (void)getDistance:(NSArray *)parms
 {
     NSDictionary *dictParas = [parms objectAtIndex:0];
-    //参数字典_dictParas
-    //    id<doIScriptEngine> _scritEngine = [parms objectAtIndex:1];
     //自己的代码实现
-
     NSString *startPoint = [doJsonHelper GetOneText:dictParas :@"startPoint" :@""];
     NSString *endPoint = [doJsonHelper GetOneText:dictParas :@"endPoint" :@""];
     NSArray *starts = [startPoint componentsSeparatedByString:@","];
@@ -184,11 +181,11 @@ BMKGeoCodeSearch *_geocodesearch;
 {
     _isScan = NO;
     _isLocating = YES;
-    _dictParas = [parms objectAtIndex:0];
     _scritEngine = [parms objectAtIndex:1];
     _callbackName = [parms objectAtIndex:2];
-    [self beginLocation:parms];
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self beginLocation:parms];
+    });
 }
 - (void)geoCode:(NSArray *)parms
 {
@@ -238,17 +235,10 @@ BMKGeoCodeSearch *_geocodesearch;
         _locService = [[BMKLocationService alloc]init];
         _locService.delegate = self;
     }
-    
-    
-    [_locService startUserLocationService];
-    
-    if (!_geocodesearch) {
-        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
-        _geocodesearch.delegate = self;
-    }
-    
-    
     _model = [doJsonHelper GetOneText:_dictParas :@"model" :@"high"];
+    if (_model.length < 2) {
+        _model = @"high";
+    }
     if ([_model isEqualToString:@"high"])
     {
         _locService.desiredAccuracy = kCLLocationAccuracyBest;
@@ -264,6 +254,7 @@ BMKGeoCodeSearch *_geocodesearch;
         _locService.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
         _locService.distanceFilter = 100.f;
     }
+    [_locService startUserLocationService];
 }
 #pragma mark - BMKLocationServiceDelegate方法
 /**
@@ -285,7 +276,10 @@ BMKGeoCodeSearch *_geocodesearch;
     _coordinate.longitude = userLocation.location.coordinate.longitude;
     BMKReverseGeoCodeOption *reverseGeocodeSearchOption = [[BMKReverseGeoCodeOption alloc]init];
     reverseGeocodeSearchOption.reverseGeoPoint = _coordinate;
-    
+    if (!_geocodesearch) {
+        _geocodesearch = [[BMKGeoCodeSearch alloc]init];
+        _geocodesearch.delegate = self;
+    }
     BOOL flag = [_geocodesearch reverseGeoCode:reverseGeocodeSearchOption];
     if(flag)
     {
@@ -324,15 +318,15 @@ BMKGeoCodeSearch *_geocodesearch;
  */
 - (void)onGetGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
 {
-    NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
+//    NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
     if (error == 0) {
         
-        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
-        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
-        [_dict setValue:result.address forKey:@"address"];
-        doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
-        [_invokeResult SetResultNode: _dict];
-        [self.EventCenter FireEvent:@"result" :_invokeResult];
+//        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
+//        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
+//        [_dict setValue:result.address forKey:@"address"];
+//        doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
+//        [_invokeResult SetResultNode: _dict];
+//        [self.EventCenter FireEvent:@"result" :_invokeResult];
         //地理编码回调
         NSMutableDictionary *node = [NSMutableDictionary dictionary];
         [node setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
@@ -341,18 +335,18 @@ BMKGeoCodeSearch *_geocodesearch;
         [invokeResult SetResultNode:node];
         [_scritEngine Callback:_callbackName :invokeResult];
     }
-    if (!self.isLoop)
-    {
-        [_locService stopUserLocationService];
-    }
-    if (!_isScan) {
-        [_locService stopUserLocationService];
-    }
-    if (_isLocating) {
-        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
-        [result SetResultNode:_dict];
-        [_scritEngine Callback:_callbackName :result];
-    }
+//    if (!self.isLoop)
+//    {
+//        [_locService stopUserLocationService];
+//    }
+//    if (!_isScan) {
+//        [_locService stopUserLocationService];
+//    }
+//    if (_isLocating) {
+//        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+//        [result SetResultNode:_dict];
+//        [_scritEngine Callback:_callbackName :result];
+//    }
 }
 
 /**
@@ -364,26 +358,34 @@ BMKGeoCodeSearch *_geocodesearch;
 -(void) onGetReverseGeoCodeResult:(BMKGeoCodeSearch *)searcher result:(BMKReverseGeoCodeResult *)result errorCode:(BMKSearchErrorCode)error
 {
     NSMutableDictionary *_dict = [[NSMutableDictionary alloc]init];
+    [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
+    [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
+    [_dict setValue:result.address forKey:@"address"];
     if (error == 0) {
-        
-        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.latitude] forKey:@"latitude"];
-        [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
-        [_dict setValue:result.address forKey:@"address"];
-        doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
-        [_invokeResult SetResultNode: _dict];
-        [self.EventCenter FireEvent:@"result" :_invokeResult];
-        //地理编码回调
-        NSMutableDictionary *node = [NSMutableDictionary dictionary];
-        [node setObject:result.address forKey:@"address"];
-        [node setObject:result.addressDetail.province forKey:@"province"];
-        [node setObject:result.addressDetail.city forKey:@"city"];
-        [node setObject:result.addressDetail.district forKey:@"district"];
-        [node setObject:result.addressDetail.streetName forKey:@"streetName"];
-        [node setObject:result.addressDetail.streetNumber forKey:@"streetNumber"];
-        
-        doInvokeResult *invokeResult = [[doInvokeResult alloc]init];
-        [invokeResult SetResultNode:node];
-        [_scritEngine Callback:_callbackName :invokeResult];
+        if (_isScan || self.isLoop) {//result事件
+            doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
+            [_invokeResult SetResultNode: _dict];
+            [self.EventCenter FireEvent:@"result" :_invokeResult];
+        }
+        if (_isLocating) {
+            doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+            [result SetResultNode:_dict];
+            [_scritEngine Callback:_callbackName :result];
+        }
+        else{
+            //地理编码回调
+            NSMutableDictionary *node = [NSMutableDictionary dictionary];
+            [node setObject:result.address forKey:@"address"];
+            [node setObject:result.addressDetail.province forKey:@"province"];
+            [node setObject:result.addressDetail.city forKey:@"city"];
+            [node setObject:result.addressDetail.district forKey:@"district"];
+            [node setObject:result.addressDetail.streetName forKey:@"streetName"];
+            [node setObject:result.addressDetail.streetNumber forKey:@"streetNumber"];
+            
+            doInvokeResult *invokeResult = [[doInvokeResult alloc]init];
+            [invokeResult SetResultNode:node];
+            [_scritEngine Callback:_callbackName :invokeResult];
+        }
     }
     if (!self.isLoop)
     {
@@ -391,11 +393,6 @@ BMKGeoCodeSearch *_geocodesearch;
     }
     if (!_isScan) {
         [_locService stopUserLocationService];
-    }
-    if (_isLocating) {
-        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
-        [result SetResultNode:_dict];
-        [_scritEngine Callback:_callbackName :result];
     }
 }
 
