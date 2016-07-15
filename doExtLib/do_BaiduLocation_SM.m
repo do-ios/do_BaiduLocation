@@ -41,7 +41,13 @@ BMKGeoCodeSearch *_geocodesearch;
     //调用locate方法
     BOOL _isLocating;
 }
-
+- (instancetype)init
+{
+    self = [super init];
+    _isScan = NO;
+    _isLocating = NO;
+    return self;
+}
 #pragma mark -
 #pragma mark - 同步异步方法的实现
 /*
@@ -371,6 +377,7 @@ BMKGeoCodeSearch *_geocodesearch;
             doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
             [result SetResultNode:_dict];
             [_scritEngine Callback:_callbackName :result];
+            _isLocating = NO;
         }
         else{
             //地理编码回调
