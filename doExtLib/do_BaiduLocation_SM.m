@@ -38,6 +38,7 @@ BMKGeoCodeSearch *_geocodesearch;
     NSString *_callbackName;
     
     BOOL _isScan;
+    BOOL _isStart;
     //调用locate方法
     BOOL _isLocating;
 }
@@ -45,6 +46,7 @@ BMKGeoCodeSearch *_geocodesearch;
 {
     self = [super init];
     _isScan = NO;
+    _isStart = NO;
     _isLocating = NO;
     return self;
 }
@@ -90,6 +92,7 @@ BMKGeoCodeSearch *_geocodesearch;
     _locService = nil;
     _geocodesearch.delegate = nil;
     _geocodesearch = nil;
+    _isStart = NO;
 }
 //异步
 /**
@@ -127,6 +130,7 @@ BMKGeoCodeSearch *_geocodesearch;
     }
     
     // 是否循环不停的获取
+    _isStart = YES;
     self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
 }
 
@@ -182,6 +186,7 @@ BMKGeoCodeSearch *_geocodesearch;
     _locService = nil;
     _geocodesearch.delegate = nil;
     _geocodesearch = nil;
+    _isScan = NO;
 }
 - (void)locate:(NSArray *)parms
 {
@@ -368,7 +373,12 @@ BMKGeoCodeSearch *_geocodesearch;
     [_dict setValue:[NSString stringWithFormat:@"%f",result.location.longitude] forKey:@"longitude"];
     [_dict setValue:result.address forKey:@"address"];
     if (error == 0) {
-        if (_isScan || self.isLoop) {//result事件
+        if (_isStart) {
+            doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
+            [_invokeResult SetResultNode: _dict];
+            [self.EventCenter FireEvent:@"result" :_invokeResult];
+        }
+        if (_isScan) {//result事件
             doInvokeResult *_invokeResult = [[doInvokeResult alloc] init:nil];
             [_invokeResult SetResultNode: _dict];
             [self.EventCenter FireEvent:@"result" :_invokeResult];
