@@ -190,10 +190,18 @@ BMKGeoCodeSearch *_geocodesearch;
 }
 - (void)locate:(NSArray *)parms
 {
+    
     _isScan = NO;
     _isLocating = YES;
     _scritEngine = [parms objectAtIndex:1];
     _callbackName = [parms objectAtIndex:2];
+    //拒绝授权
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied ||[CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
+        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+        [result SetResultNode:nil];
+        [_scritEngine Callback:_callbackName :result];
+        return;
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self beginLocation:parms];
     });
