@@ -133,7 +133,7 @@ BMKGeoCodeSearch *_geocodesearch;
     
     // 是否循环不停的获取
     _isStart = YES;
-    self.isLoop = [doJsonHelper GetBoolean:_dictParas :NO];
+    self.isLoop = [doJsonHelper GetOneBoolean:_dictParas :@"isLoop" :NO];
 }
 
 - (void)startService
