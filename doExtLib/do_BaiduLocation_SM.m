@@ -398,10 +398,10 @@ BMKGeoCodeSearch *_geocodesearch;
     }
     if (!self.isLoop)
     {
-        [_locService stopUserLocationService];
+        [self stop:nil];
     }
     if (!_isScan) {
-        [_locService stopUserLocationService];
+        [self stopScan:nil];
     }
 }
 
