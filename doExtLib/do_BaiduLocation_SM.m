@@ -197,15 +197,17 @@ BMKGeoCodeSearch *_geocodesearch;
     _isLocating = YES;
     _locateScritEngine = [parms objectAtIndex:1];
     _callbackName = [parms objectAtIndex:2];
-    //拒绝授权
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied ||[CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
-        doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
-        [result SetResultNode:nil];
-        [_locateScritEngine Callback:_callbackName :result];
-        return;
-    }
     dispatch_async(dispatch_get_main_queue(), ^{
         [self beginLocation:parms];
+        
+        //拒绝授权
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusDenied ||[CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined) {
+            doInvokeResult *result = [[doInvokeResult alloc]init:self.UniqueKey];
+            [result SetResultText:@"定位权限被拒绝,请在隐私设置中开启"];
+            [_locateScritEngine Callback:_callbackName :result];
+            return;
+        }
+        
     });
 }
 - (void)geoCode:(NSArray *)parms
