@@ -15,6 +15,10 @@
 		3BC334BD1BF2DBC700C0B446 /* do_BaiduLocation_App.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BC334B61BF2DB8400C0B446 /* do_BaiduLocation_App.h */; };
 		3BC334BE1BF2DBC700C0B446 /* do_BaiduLocation_SM.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BC334B91BF2DB8400C0B446 /* do_BaiduLocation_SM.h */; };
 		3BC334C71BF2DD8D00C0B446 /* BaiduMapAPI_Base.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC334C41BF2DD8D00C0B446 /* BaiduMapAPI_Base.framework */; };
+		3BF9AA261DDD42A100E4F9E0 /* BaiduMapAPI_Utils.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B4262721C7F0CCC00372F63 /* BaiduMapAPI_Utils.framework */; };
+		3BF9AA271DDD42A100E4F9E0 /* BaiduMapAPI_Location.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B4A29721BF46152001CBC1D /* BaiduMapAPI_Location.framework */; };
+		3BF9AA281DDD42A100E4F9E0 /* BaiduMapAPI_Search.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B4A29731BF46152001CBC1D /* BaiduMapAPI_Search.framework */; };
+		3BF9AA291DDD42A100E4F9E0 /* BaiduMapAPI_Base.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BC334C41BF2DD8D00C0B446 /* BaiduMapAPI_Base.framework */; };
 		A44BC6701AEE005E001580AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BC66F1AEE005E001580AA /* main.m */; };
 		A44BC6731AEE005E001580AA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BC6721AEE005E001580AA /* AppDelegate.m */; };
 		A44BC6761AEE005E001580AA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BC6751AEE005E001580AA /* ViewController.m */; };
@@ -61,6 +65,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				3BF9AA261DDD42A100E4F9E0 /* BaiduMapAPI_Utils.framework in CopyFiles */,
+				3BF9AA271DDD42A100E4F9E0 /* BaiduMapAPI_Location.framework in CopyFiles */,
+				3BF9AA281DDD42A100E4F9E0 /* BaiduMapAPI_Search.framework in CopyFiles */,
+				3BF9AA291DDD42A100E4F9E0 /* BaiduMapAPI_Base.framework in CopyFiles */,
 				3BC334BD1BF2DBC700C0B446 /* do_BaiduLocation_App.h in CopyFiles */,
 				3BC334BE1BF2DBC700C0B446 /* do_BaiduLocation_SM.h in CopyFiles */,
 			);
