@@ -20,7 +20,7 @@
 #import <BaiduMapAPI_Search/BMKGeocodeSearch.h>
 
 #import <BaiduMapAPI_Utils/BMKUtilsComponent.h>
-
+#import <BaiduMapAPI_Search/BMKPoiSearchType.h>
 @interface do_BaiduLocation_SM() <do_BaiduLocation_ISM, BMKLocationServiceDelegate, BMKGeoCodeSearchDelegate>
 
 @end
@@ -228,12 +228,15 @@ BMKGeoCodeSearch *_geocodesearch;
     [_geocodesearch geoCode:option];
     
 }
+
 - (void)reverseGeoCode:(NSArray *)parms
 {
     _dictParas = [parms objectAtIndex:0];
     //参数字典_dictParas
     _reverseScritEngine = [parms objectAtIndex:1];
     _callbackName = [parms objectAtIndex:2];
+    doInvokeResult *invokeResult = [[doInvokeResult alloc] init];
+    NSMutableDictionary *resultNode = [NSMutableDictionary dictionary];
     
     if (!_geocodesearch) {
         _geocodesearch = [[BMKGeoCodeSearch alloc]init];
@@ -391,6 +394,24 @@ BMKGeoCodeSearch *_geocodesearch;
                 [node setObject:result.addressDetail.district forKey:@"district"];
                 [node setObject:result.addressDetail.streetName forKey:@"streetName"];
                 [node setObject:result.addressDetail.streetNumber forKey:@"streetNumber"];
+                NSMutableArray *poiList = [NSMutableArray array];
+                for (BMKPoiInfo  *poiInfo in result.poiList) {
+                    NSMutableDictionary *pointDict = [NSMutableDictionary dictionary];
+                    [pointDict setValue:poiInfo.uid forKey:@"id"];
+                    [pointDict setValue:poiInfo.name forKey:@"name"];
+                    [pointDict setValue:poiInfo.city forKey:@"city"];
+                    [pointDict setValue:[NSNumber numberWithBool:poiInfo.panoFlag] forKey:@"isPano"];
+                    
+                    NSMutableDictionary *locationDict = [NSMutableDictionary dictionary];
+                    [locationDict setValue:[NSNumber numberWithDouble:poiInfo.pt.latitude] forKey:@"latitude"];
+                    [locationDict setValue:[NSNumber numberWithDouble:poiInfo.pt.longitude] forKey:@"longitude"];
+                    [pointDict setValue:locationDict forKey:@"location"];
+                    
+                    [pointDict setValue:poiInfo.address forKey:@"address"];
+                    
+                    [poiList addObject:pointDict];
+                }
+                [node setObject:poiList forKey:@"pois"];
                 doInvokeResult *invokeResult = [[doInvokeResult alloc]init];
                 [invokeResult SetResultNode:node];
                 [_reverseScritEngine Callback:_callbackName :invokeResult];

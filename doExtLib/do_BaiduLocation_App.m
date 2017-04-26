@@ -17,7 +17,7 @@
 @class do_BaiduLocation_App;
 static do_BaiduLocation_App * instance;
 @interface do_BaiduLocation_App() <BMKGeneralDelegate>
-
+@property (nonatomic, strong) CLLocationManager *lcManager;
 @end
 
 @implementation do_BaiduLocation_App
@@ -31,6 +31,11 @@ static do_BaiduLocation_App * instance;
 }
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    self.lcManager = [[CLLocationManager alloc] init];
+    if ([self.lcManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) {
+        [self.lcManager requestWhenInUseAuthorization];
+        [self.lcManager startUpdatingLocation];
+    }
     BMKMapManager *_mapManager = [[BMKMapManager alloc]init];
     NSString *_BMKMapKey = [[doServiceContainer Instance].ModuleExtManage GetThirdAppKey:@"baiduLocationAppKey.plist" :@"baiduLocationAppKey" ];
     NSString *isStart =  objc_getAssociatedObject(application, "BaiduMapView");
