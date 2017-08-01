@@ -104,11 +104,10 @@ BMKGeoCodeSearch *_geocodesearch;
 {
     _dictParas = [parms objectAtIndex:0];
     if (!_locService) {
-       _locService = [[BMKLocationService alloc]init];
+        _locService = [[BMKLocationService alloc]init];
         _locService.delegate = self;
     }
     
-    [_locService startUserLocationService];
     if (!_geocodesearch) {
         _geocodesearch = [[BMKGeoCodeSearch alloc]init];
         _geocodesearch.delegate = self;
@@ -134,6 +133,8 @@ BMKGeoCodeSearch *_geocodesearch;
     // 是否循环不停的获取
     _isStart = YES;
     self.isLoop = [doJsonHelper GetOneBoolean:_dictParas :@"isLoop" :NO];
+    [_locService startUserLocationService];
+    
 }
 
 - (void)startService
